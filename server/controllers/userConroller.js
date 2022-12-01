@@ -32,6 +32,7 @@ const signup = async(req,res) => {
 
 const login = async(req,res) => {
     try {
+        console.log('hello') 
         const user = await userData.findOne({
             email: req.body.email,
             password: req.body.password
@@ -39,17 +40,51 @@ const login = async(req,res) => {
     
         if(user) {
             const token = jwt.sign({
-                email:user.email
+                id:user._id,
+                name: user.name
             },'secret123')
-            return res.json({status:'ok',user:token})
+            console.log(token)
+            res.json({status:true,user:token})
         } else {
-            return res.json({status:'error',user:false})
+            res.json({status:false,user:false})
         }
     } catch(err) {
         console.log(err)
     }
 }
+const userDetails = async(req,res) => {
+    try {
+        const {id} = req.params
+        
+        const decoded = jwt.verify(id,'secret123')
+        const userId = decoded.id;
+        const details = await userData.findById({_id:userId})
+        res.json({details})
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+const uploadImg = async(req,res) => {
+    try {
+        console.log('hai')
+        const {id} = req.params
+        console.log(req.body.file)
+        const profile = await userData.findById(id)
+        console.log(req.files)
+        const imgs = req.files.map(f => ({ url: f.path, filename: f.filename }))
+        profile.image.unshift(...imgs)
+        await product.save()
+        console.log(profile)
+        res.json({image:profile.image})
+    } catch(err) {
+        console.log(err)
+    }
+}
+
 module.exports = {
     signup,
-    login
+    login,
+    userDetails,
+    uploadImg
 }

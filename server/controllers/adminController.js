@@ -1,5 +1,6 @@
 const adminData  = require('../models/adminModel')
 const userData = require('../models/userModel')
+const jwt = require('jsonwebtoken')
 
 const login = async(req,res) => {
     try {
@@ -17,12 +18,17 @@ const login = async(req,res) => {
             
         })
         if(!req.body.name || !req.body.password) {
-            res.json({status:'blank'})
+            res.json({status:false})
         } else if(adm) {
-            res.json({status:'ok'})
+            const token = jwt.sign({
+                id:adm._id,
+                name: adm.name
+            },'secret456')
+            console.log(token)
+            res.json({status:true,admin:token})
 
         } else {
-            res.json({status:'error'})
+            res.json({status:false})
         }
     } catch(err) {
         console.log(err)

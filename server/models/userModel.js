@@ -12,7 +12,11 @@ const userSchema = new mongoose.Schema({
     password: {
         type:String,
         required: true
-    }
+    },
+    image: [{
+        url:String,
+        filename:String
+    }]
 },{timestamps:true})
 
 module.exports = mongoose.model('UserData', userSchema)

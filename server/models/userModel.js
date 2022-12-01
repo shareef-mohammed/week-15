@@ -13,10 +13,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required: true
     },
-    image: [{
-        url:String,
-        filename:String
-    }]
+    image: {
+        type:String,
+        
+    }
 },{timestamps:true})
 
 module.exports = mongoose.model('UserData', userSchema)

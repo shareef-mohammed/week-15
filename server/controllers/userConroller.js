@@ -1,8 +1,14 @@
 const jwt = require('jsonwebtoken')
 const userData = require('../models/userModel')
 
+const {
+    hashPassword,
+    comparePassword
+} = require('../utils/helpers')
+
 
 const signup = async(req,res) => {
+    
     try {
         const user = await userData.findOne({
             email: req.body.email
@@ -14,10 +20,13 @@ const signup = async(req,res) => {
             res.json({status:'matchErr'})
         }
         else if(!user){
+            const {name,email,password} = req.body
+            const hashedPassword = hashPassword(password)
+            
             await userData.create({
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password
+                name,
+                email,
+                password: hashedPassword
             })
             res.json({status:'ok'})
         } else {
@@ -32,19 +41,25 @@ const signup = async(req,res) => {
 
 const login = async(req,res) => {
     try {
-        console.log('hello') 
+        
         const user = await userData.findOne({
             email: req.body.email,
-            password: req.body.password
+           
         })
-    
+        
         if(user) {
+            const password = req.body.password
+            const isValid = comparePassword(password,user.password)
+           if(isValid){
             const token = jwt.sign({
                 id:user._id,
                 name: user.name
             },'secret123')
-            console.log(token)
-            res.json({status:true,user:token})
+            
+                res.json({status:true,user:token})
+           }else {
+                res.json({status:false,user:false})
+           }
         } else {
             res.json({status:false,user:false})
         }
@@ -67,16 +82,14 @@ const userDetails = async(req,res) => {
 
 const uploadImg = async(req,res) => {
     try {
-        console.log('hai')
+       
         const {id} = req.params
-        console.log(req.body.file)
-        const profile = await userData.findById(id)
-        console.log(req.files)
-        const imgs = req.files.map(f => ({ url: f.path, filename: f.filename }))
-        profile.image.unshift(...imgs)
-        await product.save()
-        console.log(profile)
-        res.json({image:profile.image})
+        const {url} = req.body
+        
+        const profile = await userData.findByIdAndUpdate(id,{image:url})
+        await profile.save()
+        res.json({profile})
+       
     } catch(err) {
         console.log(err)
     }

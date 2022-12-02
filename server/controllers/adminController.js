@@ -22,7 +22,8 @@ const login = async(req,res) => {
         } else if(adm) {
             const token = jwt.sign({
                 id:adm._id,
-                name: adm.name
+                name: adm.name,
+                type: 'admin'
             },'secret456')
             console.log(token)
             res.json({status:true,admin:token})

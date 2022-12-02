@@ -53,7 +53,8 @@ const login = async(req,res) => {
            if(isValid){
             const token = jwt.sign({
                 id:user._id,
-                name: user.name
+                name: user.name,
+                type:'user'
             },'secret123')
             
                 res.json({status:true,user:token})

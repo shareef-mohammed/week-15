@@ -10,8 +10,10 @@ const {
     removeUser
 } = require('../controllers/adminController')
 
+const auth = require('../middleware/auth')
+
 router.post('/dashboard', login)
-router.get('/dashboard', getDashboard)
+router.get('/dashboard', auth.validateAdminToken, getDashboard)
 router.get('/view/:id', singleUser)
 router.get('/edit/:id',editUser)
 router.post('/update/:id', updateUser)
